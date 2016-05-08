@@ -13,10 +13,11 @@ AZUL = (0, 0, 255)
 ROJO = (255, 0, 0)
 VERDE = (0, 255, 0)
 CELESTE = (153, 255, 204) 
+PURPURA= (61, 6, 49)
 
 #  Dimensiones de la pantalla
 LARGO_PANTALLA  = 800
-ALTO_PANTALLA = 600
+ALTO_PANTALLA = 700
  
 class Protagonista(pygame.sprite.Sprite): 
     """ Esta clase representa la barra inferior que controla el protagonista. """
@@ -157,7 +158,7 @@ class Nivel():
      
     def draw(self, pantalla):
         """ Dibujamos todo en este nivel. """
-        pantalla.fill(AZUL)
+        pantalla.fill(PURPURA)
         self.listade_plataformas.draw(pantalla)
         self.listade_enemigos.draw(pantalla)
          
@@ -185,15 +186,18 @@ class Nivel_01(Nivel):
         self.limitedel_nivel = -1000
  
 	#ANCHO, ALTO, x, y
-        nivel = [ [150, 35, 140, 525],
-                  [210, 35, 800, 400],
-                  [210, 35, 1000, 500],
-                  [210, 35, 1120, 280],
+        nivel = [ [150, 35, 140, 625],
+                  [150, 35, 360, 500],
+                  [150, 35, 0, 375],
+                  [150, 35, 580, 625],
+		  [150, 35, 1000, 375],
+		  [250, 35, 1320, 500],
+		  [300, 35, 630, 250],
                   ]
 
-	bordes = [ [120, 600, -120, 0],
-		   [1800, 2, 0, 0],
-		   [120, 600, 1800, 0],
+	bordes = [ [120, 700, -120, 0],
+		   [2000, 2, 0, 0],
+		   [220, 600, 1800, 100],
 		   ]
 
         for plataforma in nivel:
@@ -215,12 +219,10 @@ class Nivel_01(Nivel):
 
 def main():
     """ Programa Principal """
-    pygame.init() 
-        
-
+    pygame.init()  
+	
     dimensiones = [LARGO_PANTALLA, ALTO_PANTALLA] 
-    pantalla = pygame.display.set_mode(dimensiones) 
-       
+    pantalla = pygame.display.set_mode(dimensiones, pygame.FULLSCREEN)     
     pygame.display.set_caption("NIVEL 1") 
      
 
@@ -261,6 +263,10 @@ def main():
                     protagonista.ir_derecha()
                 if evento.key == pygame.K_UP:
                     protagonista.saltar()
+		if evento.key == pygame.K_f:
+                    pygame.display.toggle_fullscreen()
+		if evento.key == pygame.K_s:
+                    hecho = True
                      
             if evento.type == pygame.KEYUP:
                 if evento.key == pygame.K_LEFT and protagonista.cambio_x < 0: 
@@ -275,9 +281,9 @@ def main():
         nivel_actual.update()
          
         # Si el protagonista se aproxima al borde derecho, desplazamos el escenario a la izquierda(-x)
-        if protagonista.rect.x >= 500:
-            diff = protagonista.rect.x - 500
-            protagonista.rect.x = 500
+        if protagonista.rect.x >= 550:
+            diff = protagonista.rect.x - 550
+            protagonista.rect.x = 550
             nivel_actual.escenario_desplazar(-diff)
      
         # Si el protagonista se aproxima al borde izquierdo, desplazamos el escenario a la derecha(+x)
