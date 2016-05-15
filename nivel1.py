@@ -75,8 +75,8 @@ class Protagonista(pygame.sprite.Sprite):
         if self.rect.y >= ALTO_PANTALLA - self.rect.height and self.cambio_y >= 0:
             self.cambio_y = 0
             self.rect.y = ALTO_PANTALLA - self.rect.height
- 
 
+   
     def jump(self):
         
         self.rect.y += 2
@@ -91,15 +91,35 @@ class Protagonista(pygame.sprite.Sprite):
     def ir_izquierda(self):
         """ Es llamado cuando el usuario pulsa la flecha izquierda  """
         self.cambio_x = -6
+
  
     def ir_derecha(self):
         """ Es llamado cuando el usuario pulsa la flecha  derecha """
         self.cambio_x = 6
+
  
     def stop(self):
        
         self.cambio_x = 0
  
+
+class Balas(pygame.sprite.Sprite):
+    """ Balas de protagonista """
+    def __init__(self, largo, alto ):
+       
+        pygame.sprite.Sprite.__init__(self)
+        imagen=pygame.image.load('imagenes/heart.png')
+        self.rect = self.image.get_rect()
+	self.contador=0
+
+    def bala1(self,centro):
+	if contador < 24:
+	   lista=circunferenciaPuntoMedio2(centro,30)
+	   pto=lista[contador]
+	   self.rect.x = pto[0]
+	   self.rect.y = pto[1]
+	   contador +=1
+	
 
                    
 class Plataforma(pygame.sprite.Sprite):
@@ -192,6 +212,7 @@ class Nivel():
          
         # Cuán lejos a la izquierda/derecha se ha desplazado el escenario
 	self.desplazar_escenario = 0
+	self.desplazar_escenarioy = 0
 	self.limitedel_nivel = -1000
      
     # update todo en este Nivel
@@ -218,6 +239,22 @@ class Nivel():
              
         for enemigo in self.listade_enemigos:
             enemigo.rect.x += desplazar_x
+
+    def escenario_desplazar_abajo(self, desplazar_y):
+        """ Cuando el usuario se mueve hacia arriba y necesitamos que todo se desplace: """
+         
+        # Llevamos la cuenta de la cantidad de desplazamiento
+        self.desplazar_escenario += desplazar_y
+         
+        # Iteramos a través de todas las listas de sprites y desplazamos
+        for Plataforma in self.listade_plataformas:
+            Plataforma.rect.y += desplazar_y
+             
+        for enemigo in self.listade_enemigos:
+            enemigo.rect.y += desplazar_y
+
+	
+
      
 # Creamos las Plataformas para el Nivel
 class Nivel_01(Nivel):
@@ -242,8 +279,9 @@ class Nivel_01(Nivel):
                   ]
 
 	bordes = [ [120, 700, -120, 0],
-		   [2000, 2, 0, 0],
+		   [2000, 2, 0, -120],
 		   [220, 600, 1800, 100],
+		   [2000, 120, 0, 700],
 		   ]
 
          
@@ -336,6 +374,7 @@ def main():
                     protagonista.ir_derecha()
                 if evento.key == pygame.K_UP:
                     protagonista.jump()
+	            #nivel_actual.escenario_desplazar_abajo(10)
                      
             if evento.type == pygame.KEYUP:
                 if evento.key == pygame.K_LEFT and protagonista.cambio_x < 0: 
@@ -360,8 +399,20 @@ def main():
             diff = 120 - protagonista.rect.x
             protagonista.rect.x = 120
             nivel_actual.escenario_desplazar(diff)
-  
-             
+
+	if protagonista.cambio_y < 0:
+            nivel_actual.escenario_desplazar_abajo(1)
+
+            
+       # Si el protagonista se aproxima al borde inferior, desplazamos el escenario hacia arriba(-y)
+        lista_impactos= pygame.sprite.spritecollide(protagonista, protagonista.nivel.listade_plataformas, False)
+	if protagonista.cambio_y > 0 and len(lista_impactos)>0:
+            protagonista.rect.bottom = bloque.rect.top 
+        elif protagonista.cambio_y > 0 and len(lista_impactos)==0:
+            nivel_actual.escenario_desplazar_abajo(-1)
+            
+
+
         nivel_actual.draw(pantalla)
         listade_sprites_activas.draw(pantalla)
            
