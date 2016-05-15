@@ -10,7 +10,7 @@ class Menu:
     
     def __init__(self, opciones):
         self.opciones = opciones
-        self.font = pygame.font.Font('dejavu.ttf', 20)
+        self.font = pygame.font.Font('fondos/dejavu.ttf', 20)
         self.seleccionado = 0
         self.total = len(self.opciones)
         self.mantiene_pulsado = False
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     pygame.font.init()
     screen = pygame.display.set_mode((ANCHO, ALTO))
-    fondo = pygame.image.load("tarde.jpg").convert()
+    fondo = pygame.image.load("imagenes/tarde.jpg").convert()
     menu = Menu(opciones)
 
     while not salir:

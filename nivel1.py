@@ -18,8 +18,7 @@ ALTO_PANTALLA = 700
 class Protagonista(pygame.sprite.Sprite): 
     """ Esta clase representa la barra inferior que controla el protagonista. """
     cambio_x = 0
-    cambio_y = 0 
-    
+    cambio_y = 0     
     Nivel = None     
  
     def __init__(self): 
@@ -27,8 +26,7 @@ class Protagonista(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)         
         largo = 40
         alto = 50
-        self.image = pygame.Surface([largo, alto])
-        self.image.fill(ROJO)        
+        self.image = pygame.image.load("imagenes/rana.png").convert_alpha()    
         self.rect = self.image.get_rect() 
        
     def update(self): 
@@ -240,6 +238,7 @@ class Nivel_01(Nivel):
 		  [150, 35, 1000, 375],
 		  [250, 35, 1320, 500],
 		  [300, 35, 630, 250],
+		  [300, 35, 1650, 200],
                   ]
 
 	bordes = [ [120, 700, -120, 0],
@@ -272,6 +271,18 @@ class Nivel_01(Nivel):
         bloque.limite_izquierda = 360
         bloque.limite_derecha = 700
         bloque.cambio_x = 1
+        bloque.protagonista = self.protagonista
+        bloque.nivel = self
+        self.listade_plataformas.add(bloque)
+
+	#Plataforma movil no.2
+					#ancho, alto
+	bloque = PlataformaEnMovimiento(150, 35) 
+        bloque.rect.x = 1050
+        bloque.rect.y = 175
+        bloque.limite_izquierda = 1050
+        bloque.limite_derecha = 1330
+        bloque.cambio_x = 2
         bloque.protagonista = self.protagonista
         bloque.nivel = self
         self.listade_plataformas.add(bloque)
