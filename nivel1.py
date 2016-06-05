@@ -128,8 +128,8 @@ class Plataforma(pygame.sprite.Sprite):
        
         pygame.sprite.Sprite.__init__(self)
          
-        self.image = pygame.Surface([largo, alto])
-        self.image.fill(CELESTE)    
+        self.image = pygame.image.load("imagenes/muritocentro.png").convert_alpha()    
+        self.image =pygame.transform.scale(self.image, (largo, alto))
                  
         self.rect = self.image.get_rect()
 
@@ -208,7 +208,7 @@ class Nivel():
         self.protagonista = protagonista
          
         # Imagen de fondo
-        self.imagende_fondo = None
+        self.imagende_fondo = pygame.image.load("imagenes/fondo3.png").convert_alpha()
          
         # Cuán lejos a la izquierda/derecha se ha desplazado el escenario
 	self.desplazar_escenario = 0
@@ -223,36 +223,47 @@ class Nivel():
      
     def draw(self, pantalla):
         """ draw todo en este Nivel. """
-        pantalla.fill(PURPURA)
+        pantalla.blit(self.imagende_fondo, (0, 0))
         self.listade_plataformas.draw(pantalla)
         self.listade_enemigos.draw(pantalla)
          
     def escenario_desplazar(self, desplazar_x):
         """ Cuando el usuario se mueve de izquierda/derecha y necesitamos que todo se desplace: """
-         
-        # Llevamos la cuenta de la cantidad de desplazamiento
-        self.desplazar_escenario += desplazar_x
-         
-        # Iteramos a través de todas las listas de sprites y desplazamos
-        for Plataforma in self.listade_plataformas:
-            Plataforma.rect.x += desplazar_x
-             
-        for enemigo in self.listade_enemigos:
-            enemigo.rect.x += desplazar_x
+        
+	if (self.desplazar_escenario >= self.limitedel_nivel-desplazar_x and self.desplazar_escenario <= 10-desplazar_x): 
+		# Llevamos la cuenta de la cantidad de desplazamiento
+		self.desplazar_escenario += desplazar_x
+		
+		 
+		# Iteramos a través de todas las listas de sprites y desplazamos
+		for Plataforma in self.listade_plataformas:
+		    Plataforma.rect.x += desplazar_x
+		     
+		for enemigo in self.listade_enemigos:
+		    enemigo.rect.x += desplazar_x
+
+		return 0
+	else:
+		return 1
+
 
     def escenario_desplazar_abajo(self, desplazar_y):
         """ Cuando el usuario se mueve hacia arriba y necesitamos que todo se desplace: """
-         
-        # Llevamos la cuenta de la cantidad de desplazamiento
-        self.desplazar_escenario += desplazar_y
-         
-        # Iteramos a través de todas las listas de sprites y desplazamos
-        for Plataforma in self.listade_plataformas:
-            Plataforma.rect.y += desplazar_y
-             
-        for enemigo in self.listade_enemigos:
-            enemigo.rect.y += desplazar_y
-
+        
+	if (self.desplazar_escenarioy <= 130-desplazar_y and self.desplazar_escenarioy >= -20-desplazar_y): 
+		# Llevamos la cuenta de la cantidad de desplazamiento
+		self.desplazar_escenarioy += desplazar_y
+		print self.desplazar_escenarioy
+		 
+		# Iteramos a través de todas las listas de sprites y desplazamos
+		for Plataforma in self.listade_plataformas:
+		    Plataforma.rect.y += desplazar_y
+		     
+		for enemigo in self.listade_enemigos:
+		    enemigo.rect.y += desplazar_y
+		return 0
+	else:
+		return 1
 	
 
      
@@ -266,7 +277,7 @@ class Nivel_01(Nivel):
         # Llamada al constructor padre
         Nivel.__init__(self, protagonista)
  
-        self.limitedel_nivel = -1500
+        self.limitedel_nivel = -1050
          
         #ANCHO, ALTO, x, y
         nivel = [ [150, 35, 140, 625],
@@ -374,7 +385,6 @@ def main():
                     protagonista.ir_derecha()
                 if evento.key == pygame.K_UP:
                     protagonista.jump()
-	            #nivel_actual.escenario_desplazar_abajo(10)
                      
             if evento.type == pygame.KEYUP:
                 if evento.key == pygame.K_LEFT and protagonista.cambio_x < 0: 
@@ -391,25 +401,33 @@ def main():
         # Si el protagonista se aproxima al borde derecho, desplazamos el escenario a la izquierda(-x)
         if protagonista.rect.x >= 550:
             diff = protagonista.rect.x - 550
-            protagonista.rect.x = 550
-            nivel_actual.escenario_desplazar(-diff)
+            mov=nivel_actual.escenario_desplazar(-diff)
+	    if mov == 0:
+		protagonista.rect.x = 550
+		
      
         # Si el protagonista se aproxima al borde izquierdo, desplazamos el escenario a la derecha(+x)
-        if protagonista.rect.x <= 120:
-            diff = 120 - protagonista.rect.x
-            protagonista.rect.x = 120
-            nivel_actual.escenario_desplazar(diff)
+        if protagonista.rect.x <= 250:
+            diff = 250 - protagonista.rect.x
+            mov=nivel_actual.escenario_desplazar(diff)
+	    if mov == 0:
+		protagonista.rect.x = 250
 
-	if protagonista.cambio_y < 0:
-            nivel_actual.escenario_desplazar_abajo(1)
+	# Si el protagonista se aproxima al borde superior, desplazamos el escenario a bajo(+y)
+	if protagonista.rect.y <= 250:
+            diff = 250 - protagonista.rect.y
+            mov=nivel_actual.escenario_desplazar_abajo(diff)
+	    if mov == 0:
+		protagonista.rect.y = 250
 
-            
-       # Si el protagonista se aproxima al borde inferior, desplazamos el escenario hacia arriba(-y)
-        lista_impactos= pygame.sprite.spritecollide(protagonista, protagonista.nivel.listade_plataformas, False)
-	if protagonista.cambio_y > 0 and len(lista_impactos)>0:
-            protagonista.rect.bottom = bloque.rect.top 
-        elif protagonista.cambio_y > 0 and len(lista_impactos)==0:
-            nivel_actual.escenario_desplazar_abajo(-1)
+	# Si el protagonista se aproxima al borde superior, desplazamos el escenario a bajo(-y)
+	if protagonista.rect.y >= 450:
+            diff = protagonista.rect.y -450
+            mov=nivel_actual.escenario_desplazar_abajo(-diff)
+	    if mov == 0:
+		protagonista.rect.y = 450
+
+	
             
 
 
