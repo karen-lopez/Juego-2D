@@ -1,9 +1,10 @@
 
 import pygame
 from pygame.locals import *
+from nivel1 import main
 
 ANCHO=800
-ALTO=600
+ALTO=500
 
 class Menu:
     "Representa un menu con opciones para un juego"
@@ -25,11 +26,12 @@ class Menu:
             elif k[K_DOWN]:
                 self.seleccionado += 1
             elif k[K_RETURN]:
-
                 # Invoca a la funcion asociada a la opcion.
                 titulo, funcion = self.opciones[self.seleccionado]
                 print "Selecciona la opcion '%s'." %(titulo)
-                funcion()
+		if titulo == "Jugar" :
+			main(screen)
+                
 
         # procura que el cursor este entre las opciones permitidas
         if self.seleccionado < 0:
@@ -64,6 +66,7 @@ class Menu:
 
 def comenzar_nuevo_juego():
     print "nuevo juego."
+    
 
 def mostrar_opciones():
     print " opciones."

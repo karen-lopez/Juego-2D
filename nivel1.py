@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import pygame
+import random
+import math
+from Bresenham import *
  
 # Colores
 NEGRO = (0, 0, 0) 
@@ -19,7 +22,9 @@ class Protagonista(pygame.sprite.Sprite):
     """ Esta clase representa la barra inferior que controla el protagonista. """
     cambio_x = 0
     cambio_y = 0     
-    Nivel = None     
+    Nivel = None
+    left = 0
+    right = 0   
  
     def __init__(self): 
 
@@ -86,11 +91,31 @@ class Protagonista(pygame.sprite.Sprite):
         
         if len(lista_impactos_plataforma) > 0 or self.rect.bottom >= ALTO_PANTALLA:
             self.cambio_y = -10
-             
+
+    def cambiarImagen(self, imagen):
+		self.image = pygame.image.load(imagen)
+		self.image =pygame.transform.scale(self.image, (40, 50)).convert_alpha()
+		pygame.display.flip()  
+		
    
     def ir_izquierda(self):
         """ Es llamado cuando el usuario pulsa la flecha izquierda  """
-        self.cambio_x = -6
+        self.cambio_x = -3
+	if self.left==0:
+		self.cambiarImagen("imagenes/Margery_Run Left_0.png")
+		self.left += 1
+	if self.left==1:
+		self.cambiarImagen("imagenes/Margery_Run Left_1.png")
+		self.left += 1
+	if self.left==2:
+		self.cambiarImagen("imagenes/Margery_Run Left_2.png")
+		self.left += 1
+	if self.left==3:
+		self.cambiarImagen("imagenes/Margery_Run Left_3.png")
+		self.left += 1  
+	if self.left==4:
+		self.cambiarImagen("imagenes/Margery_Run Left_4.png")
+		self.left =0 
 
  
     def ir_derecha(self):
@@ -103,32 +128,134 @@ class Protagonista(pygame.sprite.Sprite):
         self.cambio_x = 0
  
 
+#---------------------CLASE BALAS----------------------------------------
 class Balas(pygame.sprite.Sprite):
     """ Balas de protagonista """
-    def __init__(self, largo, alto ):
+    def __init__(self, protagonista):
        
         pygame.sprite.Sprite.__init__(self)
-        imagen=pygame.image.load('imagenes/heart.png')
+        self.image=pygame.image.load('imagenes/heart.png')
         self.rect = self.image.get_rect()
 	self.contador=0
+	self.protagonista=protagonista
 
-    def bala1(self,centro):
-	if contador < 24:
-	   lista=circunferenciaPuntoMedio2(centro,30)
-	   pto=lista[contador]
+    def update(self):
+	if self.contador < 240:
+	   lista=circunferenciaPuntoMedio2(self.protagonista.rect,40)
+	   print len(lista)
+	   pto=lista[self.contador]
 	   self.rect.x = pto[0]
 	   self.rect.y = pto[1]
-	   contador +=1
-	
+	   self.contador +=1
+	else:
+		self.contador=0
 
+
+
+#-------CLASE ENEMIGO-------------------------------------------------------------
+class Enemigo(pygame.sprite.Sprite):
+	def __init__(self, imagen):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load(imagen).convert_alpha()
+		self.rect = self.image.get_rect()
+		self.direccion=0
+		self.disparar=100
+
+
+	def cambiarImagen(self, imagen):
+		self.image = pygame.image.load(imagen).convert_alpha()
+		self.rect = self.image.get_rect()
+
+	def objetivoCerca(self, objetivo):
+		x1=objetivo.rect.x
+		y1=objetivo.rect.y
+		x2=self.rect.x
+		y2=self.rect.y
+		d=math.sqrt((x2-x1)**2 + (y2-y1)**2)
+		if d<200:
+			return True
+		else:
+			return False
+
+	def Atacar(self, objetivo):
+		x1=objetivo.recta().x
+		y1=objetivo.recta().y
+		x2=self.rect.x
+		y2=self.rect.y
+		dx=x1-x2
+		dy=y1-y2
+
+		
+		self.Mover(dx,dy)
+
+	def Mover(self,dx,dy):
+		k=1
+		pasos=1.0
+		if abs(dx)>abs(dy):
+			pasos=abs(dx)
+		else:
+			pasos=abs(dy)
+	
+		x=self.rect.x
+		y=self.rect.y
+		print pasos
+		Xinic=dx/(pasos)
+		Yinic=dy/(pasos)
+		x=x+Xinic
+		y=y+Yinic
+		self.rect.y=y
+		self.rect.x=x
+
+	def moverAleatorio(self):
+		x=random.randrange(200)
+		if self.rect.y >= (ALTO-100):
+			self.direccion=0
+		if self.rect.y <= 10:
+			self.direccion=1
+		if self.rect.x >= (ANCHO-20):
+			self.direccion=2
+		if self.rect.x <= 10:
+			self.direccion=3
+
+		if self.direccion == 0:
+			self.rect.y-=5
+		if self.direccion == 1:
+			self.rect.y+=5
+		if self.direccion == 2:
+			self.rect.x-=5
+		if self.direccion == 3:
+			self.rect.x+=5
+
+		if x==4:
+			self.rect.x-=5
+		if x==11:
+			self.rect.y+=5
+		if x==9:
+			self.rect.x+=5
+		if x==17:
+			self.rect.y-=5
+			
+		
+		
+
+
+
+#-----------------------------CLASE PLATAFORMA----------------------------
                    
 class Plataforma(pygame.sprite.Sprite):
     """ Plataforma sobre la que el usuario puede saltar. """
-    def __init__(self, largo, alto ):
+    def __init__(self, largo, alto):
        
         pygame.sprite.Sprite.__init__(self)
-         
-        self.image = pygame.image.load("imagenes/muritocentro.png").convert_alpha()    
+	
+	n=largo/32
+	if n==3:
+		self.image = pygame.image.load("imagenes/bloque3.png").convert_alpha() 
+	if n==4:
+		self.image = pygame.image.load("imagenes/bloque4.png").convert_alpha()  
+	if n==6:
+		self.image = pygame.image.load("imagenes/bloque6.png").convert_alpha()
+   
         self.image =pygame.transform.scale(self.image, (largo, alto))
                  
         self.rect = self.image.get_rect()
@@ -253,8 +380,7 @@ class Nivel():
 	if (self.desplazar_escenarioy <= 130-desplazar_y and self.desplazar_escenarioy >= -20-desplazar_y): 
 		# Llevamos la cuenta de la cantidad de desplazamiento
 		self.desplazar_escenarioy += desplazar_y
-		print self.desplazar_escenarioy
-		 
+		
 		# Iteramos a través de todas las listas de sprites y desplazamos
 		for Plataforma in self.listade_plataformas:
 		    Plataforma.rect.y += desplazar_y
@@ -280,13 +406,14 @@ class Nivel_01(Nivel):
         self.limitedel_nivel = -1050
          
         #ANCHO, ALTO, x, y
-        nivel = [ [150, 35, 140, 625],
-                  [150, 35, 0, 375],
-                  [150, 35, 580, 625],
-		  [150, 35, 1000, 375],
-		  [250, 35, 1320, 500],
-		  [300, 35, 630, 250],
-		  [300, 35, 1650, 200],
+        nivel = [ [128, 35, 140, 625],
+                  [128, 35, 0, 375],
+                  [128, 35, 580, 625],
+		  [128, 35, 1000, 375],
+		  [192, 35, 1320, 500],
+		  [128, 35, 630, 250],
+		  [128, 35, 758, 250],
+		  [128, 35, 1650, 200],
                   ]
 
 	bordes = [ [120, 700, -120, 0],
@@ -338,7 +465,7 @@ class Nivel_01(Nivel):
                          
  
  
-def main():
+def main(pantalla):
     """ Programa Principal """
     pygame.init() 
         
@@ -350,6 +477,9 @@ def main():
      
     # Creamos al protagonista
     protagonista = Protagonista()
+
+    #creamos la bala del protagonista
+    bala = Balas(protagonista)
  
     # Creamos todos los Niveles
     listade_niveles = []
@@ -360,6 +490,7 @@ def main():
     nivel_actual = listade_niveles[nivel_actual_no]
      
     listade_sprites_activas = pygame.sprite.Group()
+    listade_balas=pygame.sprite.Group()
     protagonista.nivel = nivel_actual
      
     protagonista.rect.x = 340
@@ -385,6 +516,12 @@ def main():
                     protagonista.ir_derecha()
                 if evento.key == pygame.K_UP:
                     protagonista.jump()
+		if evento.key == pygame.K_SPACE:
+		    print "entro"
+                    bala.rect.x=protagonista.rect.x
+		    bala.rect.y=protagonista.rect.y
+		    listade_sprites_activas.add(bala)
+		    listade_balas.add(bala)
                      
             if evento.type == pygame.KEYUP:
                 if evento.key == pygame.K_LEFT and protagonista.cambio_x < 0: 
@@ -427,13 +564,9 @@ def main():
 	    if mov == 0:
 		protagonista.rect.y = 450
 
-	
-            
-
-
         nivel_actual.draw(pantalla)
-        listade_sprites_activas.draw(pantalla)
-           
+	listade_balas.draw(pantalla)
+        listade_sprites_activas.draw(pantalla)       
 
         # Limitamos a 60 fps
         reloj.tick(60) 
@@ -444,5 +577,5 @@ def main():
 
     pygame.quit()
  
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+ #   main()
