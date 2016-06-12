@@ -16,6 +16,8 @@ class Block(pygame.sprite.Sprite):
         self.image = img
         self.rect = self.image.get_rect()
         self.rect.topleft = pos
+    def actualizar(self,img):
+	self.rect = self.img.get_rect()
 #=======================================================================
 class Shell(Block):
     done = False
@@ -53,6 +55,28 @@ class AnimatedItem(Block):
             self.countdown = 9
         else:
             self.countdown -= 1
+#======================================================================= 
+class Animacion(Block):
+    imagen= None
+    img= None
+    def __init__(self,pos,imagen,n,width,height):
+        Block.__init__(self,pos,imagen)
+        self.imagen = imagen
+        self.rect = self.imagen.get_rect()
+        self.current_frame = 0
+        self.frames = n
+        self.frame_width = width
+        self.frame_height = height
+        
+    def update(self):
+        if self.current_frame >=  self.frames - 1:
+            self.current_frame = 0
+        else:
+            self.current_frame += 1
+        new_area = pygame.Rect((self.current_frame * self.frame_width, 0, self.frame_width, self.frame_height))
+        imag=self.imagen.subsurface(new_area)
+	self.image=img
+	self.actualizar(img)
 #=======================================================================
 class DeadSprite(Block):
     def __init__(self,pos,img):
@@ -174,11 +198,11 @@ class AnimatedBlock(Block):
     rightLimit = 0
     level = None
     player = None
-    image1 = None
-    image2 = None
+    imagen = None
+    image1= None
     dead_image = None
     firstImage = True
-    countdown = 5
+    count = 0
     is_snail = False #True if this AnimatedBlock represent a snail.
     is_shell = False #True if this AnimatedBlock represent a shell
     def __init__(self,pos,img):
@@ -188,27 +212,21 @@ class AnimatedBlock(Block):
         #------------------------------
         self.rect.x += self.changeX
         self.rect.y += self.changeY
-        #---------------------------------------------------------------        
+        #---------------------------------------------------------------
+	self.image1 = self.imagen[self.count]      
         if self.rect.bottom > self.bottomLimit or self.rect.top < self.topLimit:
             self.changeY *= -1
         cur_pos = self.rect.x - self.level.world_shift[0]
         if cur_pos < self.leftLimit or cur_pos > self.rightLimit:
             self.changeX *= -1
-            self.image1 = pygame.transform.flip(self.image1,True,False)
-            self.image2 = pygame.transform.flip(self.image2,True,False)
+	if self.changeX > 0:
+            self.image1 = pygame.transform.flip(self.imagen[self.count],True,False)
             self.dead_image = pygame.transform.flip(self.dead_image,True,False)
-        
-        if self.countdown == 0:
-            if self.firstImage:
-                self.image = self.image2
-                self.firstImage = False
-            else:
-                self.image = self.image1
-                self.firstImage = True
-            self.countdown = 5
-        else:
-            self.countdown -= 1
-        
+
+	if self.count == len(self.imagen)-1:
+		self.count=0
+        self.image= self.image1
+	self.count += 1
 #=======================================================================
 class Spring(Block):
     countdown = 150

@@ -100,22 +100,28 @@ class Protagonista(pygame.sprite.Sprite):
    
     def ir_izquierda(self):
         """ Es llamado cuando el usuario pulsa la flecha izquierda  """
-        self.cambio_x = -3
+        self.cambio_x = -2
+	if self.left==6:
+		self.left=0
 	if self.left==0:
+		print self.left
 		self.cambiarImagen("imagenes/Margery_Run Left_0.png")
-		self.left += 1
 	if self.left==1:
+		print self.left
 		self.cambiarImagen("imagenes/Margery_Run Left_1.png")
-		self.left += 1
 	if self.left==2:
+		print self.left
 		self.cambiarImagen("imagenes/Margery_Run Left_2.png")
-		self.left += 1
 	if self.left==3:
-		self.cambiarImagen("imagenes/Margery_Run Left_3.png")
-		self.left += 1  
+		print self.left
+		self.cambiarImagen("imagenes/Margery_Run Left_3.png") 
 	if self.left==4:
+		print self.left
 		self.cambiarImagen("imagenes/Margery_Run Left_4.png")
-		self.left =0 
+	if self.left==5:
+		print self.left
+		self.cambiarImagen("imagenes/Margery_Run Left_5.png")
+	self.left +=1
 
  
     def ir_derecha(self):
@@ -462,6 +468,9 @@ class Nivel_01(Nivel):
         bloque.protagonista = self.protagonista
         bloque.nivel = self
         self.listade_plataformas.add(bloque)
+
+def animacion(protagonista):
+	
                          
  
  

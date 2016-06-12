@@ -80,7 +80,8 @@ class Level(object):
     #===================================================================    
     def draw(self,screen):
         """draw everything on the screen"""
-        screen.fill(self.background_color)
+	fondo = pygame.image.load("imagenes/bosque.jpg").convert()
+        screen.blit(fondo, (0, 0))
         # Draw all the platforms into the screen:
         self.platform_list.draw(screen)
         # Draw all the items objects:
