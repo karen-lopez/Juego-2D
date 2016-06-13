@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import pygame,math
+from Bresenham import *
 
 #--Images and Sounds Files:
 images = None
@@ -84,12 +85,14 @@ class DeadSprite(Block):
     def update(self):
         self.rect.y -= 10
 #=======================================================================
-class Fly(AnimatedItem): ##aplicar algoritmo raro
+class Fly(AnimatedItem): ##aplicar bre
     dead = False
-    angle = 0
+    contador=0
+    lista=None
     def __init__(self,pos,img1,img2):
         AnimatedItem.__init__(self,pos,img1,img2)
-        
+        self.lista=circunferenciaPuntoMedio2(pos,120)
+	print len(self.lista)
     def update(self):
         if self.dead:
             self.rect.y += 10
@@ -104,14 +107,12 @@ class Fly(AnimatedItem): ##aplicar algoritmo raro
                 self.countdown = 7
             else:
                 self.countdown -= 1
-            
-            self.rect.x += int(3 * math.sin(math.radians(self.angle)))    
-            self.rect.y += int(3 * math.cos(math.radians(self.angle)))
-            
-            if self.angle >= 360:
-                self.angle = 0
-            
-            self.angle += 1
+            if self.contador==463:
+		self.contador=0
+            pto=self.lista[self.contador]
+	    self.rect.x = pto[0]
+	    self.rect.y = pto[1]
+	    self.contador +=1
         
 #=======================================================================
 class MovableBlock(Block):
