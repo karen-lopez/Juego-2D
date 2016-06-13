@@ -1,7 +1,8 @@
 # computacionGrafica
 
 trabajo final de computacion grafica
-ejecutar desde inicio.py
+
+-ejecutar desde inicio.py
 
 -juego de 1 solo nivel
 
