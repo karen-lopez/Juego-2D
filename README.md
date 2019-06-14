@@ -1,6 +1,4 @@
-# computacionGrafica
-
-trabajo final de computacion grafica
+# Juego en 2d
 
 -ejecutar desde inicio.py
 
